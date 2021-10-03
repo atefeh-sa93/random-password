@@ -1,21 +1,17 @@
 <template>
-  <div id="app">
+  <v-app>
     <GeneratePassword />
-  </div>
+  </v-app>
 </template>
 
 <script>
-import GeneratePassword from "./components/GeneratePassword";
-
+import GeneratePassword from './components/GeneratePassword'
 export default {
-  name: "App",
-  components: {
-    GeneratePassword,
-  },
+  name: 'App',
+  components: {GeneratePassword}
+
 };
 </script>
-
-<style>
-@import "./assets/style.css";
-@import '~material-icons/iconfont/material-icons.css';
+<style lang="scss">
+  @import './assets/style.scss';
 </style>
