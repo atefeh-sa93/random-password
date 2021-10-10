@@ -33,7 +33,7 @@
       </v-row>
     </v-container>
     <v-container>
-      <v-row class="card-box-handle">
+      <v-row class="card-box-handle" flat>
         <v-col cols="12" md="6">
           <div class="result">
             <h4>Password</h4>
@@ -47,8 +47,37 @@
                   outlined
                 ></v-text-field>
                 <div class="buttons">
-                  <v-btn color="primary">Generate Password</v-btn>
-                  <v-btn color="secondary">Copy Password</v-btn>
+                  <v-btn
+                    color="green"
+                    class="white--text"
+                    @click="generateNewPassword"
+                    >Generate Password</v-btn
+                  >
+                  <v-btn color="primary" outlined @click="copyPassword"
+                    >Copy Password</v-btn
+                  >
+                  <v-snackbar
+                    v-model="copyPassBar"
+                    :timeout="timeout"
+                    absolute
+                    right
+                    rounded="pill"
+                    bottom
+                    color="#5e72e4"
+                  >
+                    {{ text }}
+
+                    <template v-slot:action="{ attrs }">
+                      <v-btn
+                        color="white"
+                        text
+                        v-bind="attrs"
+                        @click="copyPassBar = false"
+                      >
+                        Close
+                      </v-btn>
+                    </template>
+                  </v-snackbar>
                 </div>
               </v-col>
             </v-row>
@@ -93,10 +122,8 @@
                   >
                     <span>{{ type.title }}</span>
                     <v-switch
-                      v-model="containing"
-                      color="red"
-                      :checked="type.checked"
-                      v-on:click="type.checked = !type.checked"
+                      v-model="type.checked"
+                      :color="type.color"
                     ></v-switch>
                   </v-col>
                 </v-row>
@@ -112,33 +139,69 @@
 export default {
   data() {
     return {
+      copyPassBar: false,
+      text: `Password coy correctly!`,
+      timeout: "2000",
       defaultLength: 8,
       passwordContents: [
         {
           title: "UpperCase",
           value: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
           checked: false,
+          color: "red",
         },
         {
           title: "LowerCase",
           value: "abcdefghijklmnopqrstuwxyz",
           checked: true,
+          color: "green",
         },
         {
           title: "Numbers",
           value: "0123456789",
           checked: true,
+          color: "blue",
         },
         {
           title: "Symbols",
           value: "`!@#$%^&*)(-_+=}{][/|?><",
           checked: false,
+          color: "purple",
         },
       ],
-      ex3: { label: "thumb-color", val: 50, color: "red" },
       password: "",
-      containing: "",
     };
+  },
+
+  methods: {
+    generateNewPassword() {
+      var passValue = "";
+      var resultPass = "";
+
+      this.passwordContents.forEach((item) => {
+        if (item.checked) {
+          passValue += item.value;
+        }
+      });
+      for (let j = 0; j < this.defaultLength; j++) {
+        resultPass += passValue.charAt(
+          Math.floor(Math.random() * passValue.length)
+        );
+      }
+      this.password = resultPass;
+    },
+    copyPassword() {
+      var copyText = this.password;
+
+     navigator.clipboard.writeText(copyText);
+      this.copyPassBar = true
+    },
+  },
+
+  watch: {
+    defaultLength: function watchDefaultLength() {
+      this.generateNewPassword();
+    },
   },
 };
 </script>
