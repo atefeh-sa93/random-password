@@ -189,6 +189,11 @@ export default {
         );
       }
       this.password = resultPass;
+      this.$ga.event('latest-release-click', {
+        'event_category': 'documentation',
+        'event_label': 'Latest Release Button Clicked',
+        'value': 1
+      })
     },
     copyPassword() {
       var copyText = this.password;
