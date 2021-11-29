@@ -10,33 +10,28 @@
     </div>
     <v-container>
       <v-row class="align-center">
-        <v-col cols="12" md="6">
-          <div class="d-flex px-3">
-            <div class="intro-icon">
-              <v-icon color="deep-purple darken-4">
-                mdi-lock-open-outline
-              </v-icon>
-            </div>
-            <div class="pl-3">
-              <h4 class="display-1 font-weight-black white--text">
-                Generate Password
-              </h4>
-              <p class="white--text text-center font-weight-bold">
-                Simple random password generator
-              </p>
-            </div>
+        <div class="d-flex px-3 mb-4 mx-auto">
+          <div class="intro-icon">
+            <v-icon color="deep-purple darken-4">
+              mdi-lock-open-outline
+            </v-icon>
           </div>
-        </v-col>
-        <v-col cols="12" md="6">
-          <v-img src="@/assets/images/pass-img-bg.svg" class="intro-img" />
-        </v-col>
+          <div class="pl-3">
+            <h4 class="display-1 font-weight-black white--text">
+              Generate Password
+            </h4>
+            <p class="white--text text-center font-weight-bold">
+              Simple random password generator
+            </p>
+          </div>
+        </div>
       </v-row>
     </v-container>
     <v-container>
       <v-row class="card-box-handle" flat>
         <v-col cols="12" md="6">
           <div class="result">
-            <h4>Password</h4>
+            <h4 class="mb-2">Password</h4>
             <v-row>
               <v-col cols="12" md="12">
                 <v-text-field
@@ -189,17 +184,17 @@ export default {
         );
       }
       this.password = resultPass;
-      this.$ga.event('latest-release-click', {
-        'event_category': 'documentation',
-        'event_label': 'Latest Release Button Clicked',
-        'value': 1
-      })
+      this.$ga.event("latest-release-click", {
+        event_category: "documentation",
+        event_label: "Latest Release Button Clicked",
+        value: 1,
+      });
     },
     copyPassword() {
       var copyText = this.password;
 
-     navigator.clipboard.writeText(copyText);
-      this.copyPassBar = true
+      navigator.clipboard.writeText(copyText);
+      this.copyPassBar = true;
     },
   },
 
@@ -208,5 +203,9 @@ export default {
       this.generateNewPassword();
     },
   },
+
+  created() {
+    this.generateNewPassword();
+  }
 };
 </script>
