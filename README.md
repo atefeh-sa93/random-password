@@ -2,7 +2,7 @@
 
 A simple random password generator.
 
-Built with Vue 3, Vite, and TypeScript. The upgrade from Vue 2 is in progress
+Built with Vue 3, Vite, TypeScript, and Vuetify 3. The upgrade from Vue 2 is in progress
 (see issues labeled `vue3-upgrade`). Code that hasn't been ported yet lives in `legacy/`.
 
 ## Requirements
