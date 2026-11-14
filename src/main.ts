@@ -6,10 +6,12 @@ import '@fontsource/roboto/700.css'
 import { createApp } from 'vue'
 
 import App from './App.vue'
+import { installAnalytics } from './plugins/analytics'
 import vuetify from './plugins/vuetify'
 
 const app = createApp(App)
 
 app.use(vuetify)
+installAnalytics(app)
 
 app.mount('#app')
