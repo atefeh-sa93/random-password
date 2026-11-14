@@ -30,13 +30,27 @@ function commitLength() {
   lengthInput.value = String(length)
 }
 
-const copyPassBar = ref(false)
-const text = 'Password coy correctly!'
-const timeout = '2000'
+const SNACKBAR_TIMEOUT = 2000
 
-function copyPassword() {
-  navigator.clipboard.writeText(password.value)
-  copyPassBar.value = true
+const snackbar = ref<{ show: boolean; text: string; color: 'success' | 'error' }>({
+  show: false,
+  text: '',
+  color: 'success',
+})
+
+async function copyPassword() {
+  try {
+    // writeText returns a Promise that rejects when the browser blocks clipboard
+    // access (page not focused, no permission, or not served over https).
+    await navigator.clipboard.writeText(password.value)
+    snackbar.value = { show: true, text: 'Password copied', color: 'success' }
+  } catch {
+    snackbar.value = {
+      show: true,
+      text: "Couldn't copy. Select the password and copy it manually.",
+      color: 'error',
+    }
+  }
 }
 </script>
 
@@ -74,7 +88,7 @@ function copyPassword() {
                   id="generator-password"
                   type="text"
                   :model-value="password"
-                  disabled
+                  readonly
                   variant="outlined"
                 ></v-text-field>
                 <div class="buttons">
@@ -85,17 +99,19 @@ function copyPassword() {
                     Copy Password
                   </v-btn>
                   <v-snackbar
-                    v-model="copyPassBar"
-                    :timeout="timeout"
+                    v-model="snackbar.show"
+                    :timeout="SNACKBAR_TIMEOUT"
                     contained
                     location="bottom right"
                     rounded="pill"
-                    color="#5e72e4"
+                    :color="snackbar.color"
                   >
-                    {{ text }}
+                    {{ snackbar.text }}
 
                     <template #actions>
-                      <v-btn color="white" variant="text" @click="copyPassBar = false">Close</v-btn>
+                      <v-btn color="white" variant="text" @click="snackbar.show = false"
+                        >Close</v-btn
+                      >
                     </template>
                   </v-snackbar>
                 </div>
