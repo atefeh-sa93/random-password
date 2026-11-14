@@ -9,8 +9,7 @@ export default defineConfigWithVueTs(
     files: ['**/*.{vue,ts,mts,tsx}'],
   },
 
-  // `legacy/` holds the old Vue 2 code until it is ported (issues #10 and #11).
-  globalIgnores(['**/dist/**', '**/coverage/**', 'legacy/**']),
+  globalIgnores(['**/dist/**', '**/coverage/**']),
 
   ...pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
