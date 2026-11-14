@@ -13,9 +13,24 @@ export const CHAR_SET_KEYS = Object.keys(CHAR_SETS) as CharSetKey[]
 export const MIN_LENGTH = 8
 export const MAX_LENGTH = 50
 
+/** Characters that are easy to confuse when reading a password. */
+export const SIMILAR_CHARS = 'iIl1Lo0O'
+
+/** Characters that often cause trouble in shells, URLs and config files. */
+export const AMBIGUOUS_CHARS = '{}[]()/\\\'"`~,;:.<>'
+
+export const PASSWORD_COUNTS = [1, 3, 5, 10] as const
+
+// `(typeof PASSWORD_COUNTS)[number]` reads the element type of the array above,
+// so this is the union 1 | 3 | 5 | 10 and stays in sync with the list.
+export type PasswordCount = (typeof PASSWORD_COUNTS)[number]
+
 export interface PasswordOptions {
   length: number
   sets: Record<CharSetKey, boolean>
+  excludeSimilar: boolean
+  excludeAmbiguous: boolean
+  count: PasswordCount
 }
 
 /**
@@ -62,12 +77,30 @@ function shuffle<T>(items: T[]): T[] {
   return items
 }
 
+function without(chars: string, excluded: string): string {
+  return [...chars].filter((char) => !excluded.includes(char)).join('')
+}
+
+/**
+ * Returns the characters of each enabled set after applying the exclude options.
+ * Sets that end up empty are dropped.
+ */
+export function buildPools(options: PasswordOptions): string[] {
+  let excluded = ''
+  if (options.excludeSimilar) excluded += SIMILAR_CHARS
+  if (options.excludeAmbiguous) excluded += AMBIGUOUS_CHARS
+
+  return CHAR_SET_KEYS.filter((key) => options.sets[key])
+    .map((key) => without(CHAR_SETS[key], excluded))
+    .filter((pool) => pool.length > 0)
+}
+
 /**
  * Generates a password that contains at least one character from every enabled set.
  * Throws if no set is enabled.
  */
 export function generatePassword(options: PasswordOptions): string {
-  const pools = CHAR_SET_KEYS.filter((key) => options.sets[key]).map((key) => CHAR_SETS[key])
+  const pools = buildPools(options)
   if (pools.length === 0) {
     throw new RangeError('At least one character set must be enabled')
   }
@@ -81,4 +114,9 @@ export function generatePassword(options: PasswordOptions): string {
   }
   // Shuffle so the guaranteed characters are not always at the start.
   return shuffle(chars).join('')
+}
+
+/** Generates `options.count` independent passwords. */
+export function generatePasswords(options: PasswordOptions): string[] {
+  return Array.from({ length: options.count }, () => generatePassword(options))
 }

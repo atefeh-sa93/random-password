@@ -1,17 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-
 import AppHeader from '@/components/AppHeader.vue'
 import OptionsPanel from '@/components/OptionsPanel.vue'
 import PasswordList from '@/components/PasswordList.vue'
+import StrengthMeter from '@/components/StrengthMeter.vue'
 import { useClipboard } from '@/composables/useClipboard'
 import { usePasswordGenerator } from '@/composables/usePasswordGenerator'
 
-const { options, password, regenerate } = usePasswordGenerator()
+const { options, passwords, strength, regenerate } = usePasswordGenerator()
 const { feedback, copy } = useClipboard()
-
-// PasswordList takes a list so it can show several passwords later (#15).
-const passwords = computed(() => [password.value])
 </script>
 
 <template>
@@ -28,7 +24,9 @@ const passwords = computed(() => [password.value])
 
       <v-row>
         <v-col cols="12" md="6">
-          <PasswordList :passwords="passwords" @copy="copy" @regenerate="regenerate" />
+          <PasswordList :passwords="passwords" @copy="copy" @regenerate="regenerate">
+            <StrengthMeter :strength="strength" class="mt-4" />
+          </PasswordList>
         </v-col>
         <v-col cols="12" md="6">
           <OptionsPanel v-model="options" />
