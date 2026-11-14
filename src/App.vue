@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import GeneratePassword from './components/GeneratePassword.vue'
+import PasswordGenerator from '@/components/PasswordGenerator.vue'
 </script>
 
 <template>
   <v-app>
-    <GeneratePassword />
+    <PasswordGenerator />
   </v-app>
 </template>
-
-<style lang="scss">
-@use './assets/style.scss';
-</style>
