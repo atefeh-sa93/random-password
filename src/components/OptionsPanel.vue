@@ -6,6 +6,7 @@ import {
   clampLength,
   MAX_LENGTH,
   MIN_LENGTH,
+  PASSWORD_COUNTS,
   type CharSetKey,
   type PasswordOptions,
 } from '@/utils/password'
@@ -99,6 +100,47 @@ function commitLength() {
       <p v-if="enabledSetCount === 1" class="text-caption text-medium-emphasis mt-2 mb-0">
         At least one character type stays on.
       </p>
+
+      <div class="text-body-2 text-medium-emphasis mt-6 mb-1">Advanced</div>
+      <v-switch
+        v-model="options.excludeSimilar"
+        color="primary"
+        density="compact"
+        hide-details
+        inset
+      >
+        <template #label>
+          Exclude similar
+          <code class="text-medium-emphasis ml-2">i I l 1 L o 0 O</code>
+        </template>
+      </v-switch>
+      <v-switch
+        v-model="options.excludeAmbiguous"
+        color="primary"
+        density="compact"
+        hide-details
+        inset
+      >
+        <template #label>
+          Exclude ambiguous
+          <code class="text-medium-emphasis ml-2">{ } [ ] ( ) / \ ' " …</code>
+        </template>
+      </v-switch>
+
+      <div class="d-flex align-center justify-space-between mt-4">
+        <span id="password-count-label" class="text-body-2">How many</span>
+        <v-btn-toggle
+          v-model="options.count"
+          mandatory
+          color="primary"
+          density="compact"
+          variant="outlined"
+          divided
+          aria-labelledby="password-count-label"
+        >
+          <v-btn v-for="count in PASSWORD_COUNTS" :key="count" :value="count">{{ count }}</v-btn>
+        </v-btn-toggle>
+      </div>
     </v-card-text>
   </v-card>
 </template>

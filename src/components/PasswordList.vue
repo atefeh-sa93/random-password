@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   passwords: readonly string[]
 }>()
 
@@ -12,7 +12,9 @@ const emit = defineEmits<{
 
 <template>
   <v-card rounded="lg" elevation="6" class="pa-2">
-    <v-card-title class="text-h6">Your password</v-card-title>
+    <v-card-title class="text-h6">
+      {{ props.passwords.length === 1 ? 'Your password' : 'Your passwords' }}
+    </v-card-title>
 
     <v-card-text class="pb-2">
       <div
@@ -31,6 +33,9 @@ const emit = defineEmits<{
           @click="emit('copy', password)"
         />
       </div>
+
+      <!-- Slot: the parent decides what goes under the list (the strength meter). -->
+      <slot />
     </v-card-text>
 
     <v-card-actions class="px-4 pb-4">
