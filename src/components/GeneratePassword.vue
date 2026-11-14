@@ -1,73 +1,43 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 
-interface PasswordContent {
-  title: string
-  value: string
-  checked: boolean
-  color: string
+import { usePasswordGenerator } from '@/composables/usePasswordGenerator'
+import { clampLength, MAX_LENGTH, MIN_LENGTH, type CharSetKey } from '@/utils/password'
+
+const { options, password, regenerate, isLastEnabledSet } = usePasswordGenerator()
+
+const charSetSwitches: { key: CharSetKey; title: string; color: string }[] = [
+  { key: 'uppercase', title: 'UpperCase', color: 'red' },
+  { key: 'lowercase', title: 'LowerCase', color: 'green' },
+  { key: 'numbers', title: 'Numbers', color: 'blue' },
+  { key: 'symbols', title: 'Symbols', color: 'purple' },
+]
+
+// The number field keeps its own text while the user is typing (so typing "1" on
+// the way to "12" is not clamped to 8 right away). It is applied on blur or Enter.
+const lengthInput = ref(String(options.value.length))
+
+watch(
+  () => options.value.length,
+  (length) => {
+    lengthInput.value = String(length)
+  },
+)
+
+function commitLength() {
+  const length = clampLength(lengthInput.value)
+  options.value.length = length
+  lengthInput.value = String(length)
 }
 
 const copyPassBar = ref(false)
 const text = 'Password coy correctly!'
 const timeout = '2000'
-const defaultLength = ref(8)
-const password = ref('')
-
-const passwordContents = ref<PasswordContent[]>([
-  {
-    title: 'UpperCase',
-    value: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    checked: false,
-    color: 'red',
-  },
-  {
-    title: 'LowerCase',
-    value: 'abcdefghijklmnopqrstuwxyz',
-    checked: true,
-    color: 'green',
-  },
-  {
-    title: 'Numbers',
-    value: '0123456789',
-    checked: true,
-    color: 'blue',
-  },
-  {
-    title: 'Symbols',
-    value: '`!@#$%^&*)(-_+=}{][/|?><',
-    checked: false,
-    color: 'purple',
-  },
-])
-
-function generateNewPassword() {
-  let passValue = ''
-  let resultPass = ''
-
-  passwordContents.value.forEach((item) => {
-    if (item.checked) {
-      passValue += item.value
-    }
-  })
-  for (let j = 0; j < defaultLength.value; j++) {
-    resultPass += passValue.charAt(Math.floor(Math.random() * passValue.length))
-  }
-  password.value = resultPass
-}
 
 function copyPassword() {
   navigator.clipboard.writeText(password.value)
   copyPassBar.value = true
 }
-
-watch(defaultLength, () => {
-  generateNewPassword()
-})
-
-// Code in <script setup> runs when the component is created,
-// so this replaces the Vue 2 `created()` hook.
-generateNewPassword()
 </script>
 
 <template>
@@ -108,7 +78,7 @@ generateNewPassword()
                   variant="outlined"
                 ></v-text-field>
                 <div class="buttons">
-                  <v-btn color="green" class="text-white" @click="generateNewPassword">
+                  <v-btn color="green" class="text-white" @click="regenerate">
                     Generate Password
                   </v-btn>
                   <v-btn color="primary" variant="outlined" @click="copyPassword">
@@ -143,12 +113,22 @@ generateNewPassword()
             </v-row>
             <v-row>
               <v-col cols="12" md="12">
-                <v-slider v-model="defaultLength" :min="8" :max="50" :step="1" class="align-center">
+                <v-slider
+                  v-model="options.length"
+                  :min="MIN_LENGTH"
+                  :max="MAX_LENGTH"
+                  :step="1"
+                  class="align-center"
+                >
                   <template #append>
                     <v-text-field
-                      v-model="defaultLength"
+                      v-model="lengthInput"
                       class="mt-0 pt-0"
                       type="number"
+                      :min="MIN_LENGTH"
+                      :max="MAX_LENGTH"
+                      @update:focused="(focused: boolean) => !focused && commitLength()"
+                      @keydown.enter="commitLength"
                       style="width: 80px"
                       variant="outlined"
                     ></v-text-field>
@@ -159,14 +139,18 @@ generateNewPassword()
                 <h6>Password content</h6>
                 <v-row>
                   <v-col
-                    v-for="type in passwordContents"
-                    :key="type.title"
+                    v-for="type in charSetSwitches"
+                    :key="type.key"
                     cols="12"
                     md="12"
                     class="d-flex align-baseline justify-space-between"
                   >
                     <span>{{ type.title }}</span>
-                    <v-switch v-model="type.checked" :color="type.color"></v-switch>
+                    <v-switch
+                      v-model="options.sets[type.key]"
+                      :color="type.color"
+                      :disabled="isLastEnabledSet(type.key)"
+                    ></v-switch>
                   </v-col>
                 </v-row>
               </v-col>
