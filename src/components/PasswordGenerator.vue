@@ -3,11 +3,24 @@ import AppHeader from '@/components/AppHeader.vue'
 import OptionsPanel from '@/components/OptionsPanel.vue'
 import PasswordList from '@/components/PasswordList.vue'
 import StrengthMeter from '@/components/StrengthMeter.vue'
+import { useAnalytics } from '@/composables/useAnalytics'
 import { useClipboard } from '@/composables/useClipboard'
 import { usePasswordGenerator } from '@/composables/usePasswordGenerator'
 
 const { options, passwords, strength, regenerate } = usePasswordGenerator()
 const { feedback, copy } = useClipboard()
+const { trackGenerate, trackCopy } = useAnalytics()
+
+// Tracked only on the button, not on every slider or switch change.
+function onGenerate() {
+  regenerate()
+  trackGenerate(options.value)
+}
+
+async function onCopy(password: string) {
+  const copied = await copy(password)
+  if (copied) trackCopy()
+}
 </script>
 
 <template>
@@ -24,7 +37,7 @@ const { feedback, copy } = useClipboard()
 
       <v-row>
         <v-col cols="12" md="6">
-          <PasswordList :passwords="passwords" @copy="copy" @regenerate="regenerate">
+          <PasswordList :passwords="passwords" @copy="onCopy" @regenerate="onGenerate">
             <StrengthMeter :strength="strength" class="mt-4" />
           </PasswordList>
         </v-col>

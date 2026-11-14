@@ -20,3 +20,11 @@ npm run type-check # check TypeScript types, including .vue files
 npm run lint       # check code with ESLint (npm run lint:fix to auto-fix)
 npm run format     # format src/ with Prettier
 ```
+
+## Analytics
+
+Google Analytics runs only when `VITE_GA_ID` is set. Production builds read it from
+`.env.production`; in development it is off by default (see `.env.example`).
+
+Two events are sent: `generate_password` (with the chosen settings) and `copy_password`.
+Passwords are never sent.

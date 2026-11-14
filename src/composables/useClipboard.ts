@@ -10,18 +10,21 @@ interface CopyFeedback {
 export function useClipboard() {
   const feedback = ref<CopyFeedback>({ show: false, text: '', color: 'success' })
 
-  async function copy(text: string) {
+  /** Resolves to true when the text was copied. */
+  async function copy(text: string): Promise<boolean> {
     try {
       // writeText returns a Promise that rejects when the browser blocks clipboard
       // access (page not focused, no permission, or not served over https).
       await navigator.clipboard.writeText(text)
       feedback.value = { show: true, text: 'Password copied', color: 'success' }
+      return true
     } catch {
       feedback.value = {
         show: true,
         text: "Couldn't copy. Select the password and copy it manually.",
         color: 'error',
       }
+      return false
     }
   }
 
